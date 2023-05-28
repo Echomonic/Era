@@ -65,8 +65,6 @@ public class Cubic<T> extends BezierCurve<T> {
         //quadB = l2 + l3
 
         if (start instanceof Location) {
-
-
             LocationInterpreter l1 = new LocationInterpreter().start(startLocationInterpreter.interpolate(elapsedTime)).end(middleToMiddleLocationInterpreter.interpolate(elapsedTime));
             LocationInterpreter l2 = new LocationInterpreter().start(middleToMiddleLocationInterpreter.interpolate(elapsedTime)).end(middleEndLocationInterpreter.interpolate(elapsedTime));
 
@@ -77,16 +75,27 @@ public class Cubic<T> extends BezierCurve<T> {
 
             return (T) quadOutput;
         } else if (start instanceof EulerAngle) {
-            EulerAngleInterpreter quadInterpreter = new EulerAngleInterpreter().start(middleToMiddleEulerAngleInterpreter.interpolate(elapsedTime)).end(middleEndEulerInterpreter.interpolate(elapsedTime));
-            EulerAngle quadOutput = quadInterpreter.interpolate(elapsedTime);
+            EulerAngleInterpreter l1 = new EulerAngleInterpreter().start(startEulerInterpreter.interpolate(elapsedTime)).end(middleToMiddleEulerAngleInterpreter.interpolate(elapsedTime));
+            EulerAngleInterpreter l2 = new EulerAngleInterpreter().start(middleToMiddleEulerAngleInterpreter.interpolate(elapsedTime)).end(middleEndEulerInterpreter.interpolate(elapsedTime));
+
+            EulerAngleInterpreter quadA = new EulerAngleInterpreter();
+            quadA.start(l1.interpolate(elapsedTime, rounded)).end(l2.interpolate(elapsedTime, rounded));
+
+            EulerAngle quadOutput = quadA.interpolate(elapsedTime, rounded);
             return (T) quadOutput;
         } else if (start instanceof Vector) {
-            VectorInterpreter quadInterpreter = new VectorInterpreter().start(middleToMiddleVectorInterpreter.interpolate(elapsedTime)).end(middleEndVectorInterpreter.interpolate(elapsedTime));
+            VectorInterpreter l1 = new VectorInterpreter().start(startVectorInterpreter.interpolate(elapsedTime)).end(middleToMiddleVectorInterpreter.interpolate(elapsedTime));
+            VectorInterpreter l2 = new VectorInterpreter().start(middleToMiddleVectorInterpreter.interpolate(elapsedTime)).end(middleEndVectorInterpreter.interpolate(elapsedTime));
+
+            VectorInterpreter quadInterpreter = new VectorInterpreter()
+                    .start(l1.interpolate(elapsedTime)).end(l2.interpolate(elapsedTime));
+
             Vector quadOutput = quadInterpreter.interpolate(elapsedTime);
             return (T) quadOutput;
         }
-
-        FloatInterpreter quad = new FloatInterpreter().start(middleToMiddleFloatInterpreter.interpolate(elapsedTime)).end(middleEndFloatInterpreter.interpolate(elapsedTime));
+        FloatInterpreter l1 = new FloatInterpreter().start(startFloatInterpreter.interpolate(elapsedTime)).end(middleToMiddleFloatInterpreter.interpolate(elapsedTime));
+        FloatInterpreter l2 = new FloatInterpreter().start(middleToMiddleFloatInterpreter.interpolate(elapsedTime)).end(middleEndFloatInterpreter.interpolate(elapsedTime));
+        FloatInterpreter quad = new FloatInterpreter().start(l1.interpolate(elapsedTime)).end(l2.interpolate(elapsedTime));
         return (T) quad.interpolate(elapsedTime);
     }
 
